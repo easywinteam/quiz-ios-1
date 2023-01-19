@@ -1,7 +1,7 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController {
-    // MARK: - Variables
+    // MARK: - MockData
     private let questions : [QuizQuestion] = [
     QuizQuestion(image: "The Godfather", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
     QuizQuestion(image: "The Dark Knight", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
@@ -15,33 +15,69 @@ final class MovieQuizViewController: UIViewController {
     QuizQuestion(image: "Vivarium", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
     QuizQuestion(image: "", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false)
     ]
+    private var currentQuestionIndex = 0
     
+    // MARK: - Outlets
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
     
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
       super.viewDidLoad()
-      /*
-      Тут имеет смысл наполнить наше view данными.
-      */
+        
+        
     }
     
     // MARK: - Actions
-    
     @IBAction private func yesButtonClicked(_ sender: Any) {
+        let currentQuestion = questions[currentQuestionIndex]
+        let givenAnswer = true
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
+    
     @IBAction private func noButtonClicked(_ sender: Any) {
+        let currentQuestion = questions[currentQuestionIndex]
+        let givenAnswer = false
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    // MARK: - Functions
+    private func show(quiz step: QuizStepViewModel){
+        
+    }
+    
+    private func show(quiz result: QuizResultsViewModel) {
+        
+    }
+    
+    private func convert(model: QuizQuestion) -> QuizStepViewModel{
+        return QuizStepViewModel(image: UIImage(named: model.image) ?? UIImage(), question: model.text, questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)")
+    }
+    
+    private func showAnswerResult(isCorrect: Bool){
+        print(isCorrect)
     }
     
 }
 
+// MARK: - Additional data structures
 struct QuizQuestion{
     let image: String
     let text: String
     let correctAnswer: Bool
+}
+//Для состояния "Вопрос задан"
+struct QuizStepViewModel{
+    let image: UIImage
+    let question: String
+    let questionNumber: String
+}
+
+// для состояния "Результат квиза"
+struct QuizResultsViewModel {
+  let title: String
+  let text: String
+  let buttonText: String
 }
 /*
  Mock-данные
