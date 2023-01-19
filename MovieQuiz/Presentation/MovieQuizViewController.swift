@@ -16,6 +16,11 @@ final class MovieQuizViewController: UIViewController {
     QuizQuestion(image: "", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false)
     ]
     
+    @IBOutlet private var imageView: UIImageView!
+    @IBOutlet private var textLabel: UILabel!
+    @IBOutlet private var counterLabel: UILabel!
+    
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
       super.viewDidLoad()
@@ -23,6 +28,14 @@ final class MovieQuizViewController: UIViewController {
       Тут имеет смысл наполнить наше view данными.
       */
     }
+    
+    // MARK: - Actions
+    
+    @IBAction private func yesButtonClicked(_ sender: Any) {
+    }
+    @IBAction private func noButtonClicked(_ sender: Any) {
+    }
+    
 }
 
 struct QuizQuestion{
