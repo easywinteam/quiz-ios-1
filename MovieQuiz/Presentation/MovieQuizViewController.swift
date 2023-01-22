@@ -12,8 +12,7 @@ final class MovieQuizViewController: UIViewController {
     QuizQuestion(image: "Old", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
     QuizQuestion(image: "The Ice Age Adventures of Buck Wild", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
     QuizQuestion(image: "Tesla", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
-    QuizQuestion(image: "Vivarium", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
-    QuizQuestion(image: "", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false)
+    QuizQuestion(image: "Vivarium", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false)
     ]
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
@@ -23,26 +22,27 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
     
-    // MARK: - Alerts
-    let action = UIAlertAction(title: "Сыграть ещё раз", style: .default, handler: { _ in
-    })
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
       super.viewDidLoad()
       showNextQuestionsOrResults()
+        //print(questions.count)
+        print(questions[9])
     }
     
     // MARK: - Actions
     @IBAction private func yesButtonClicked(_ sender: Any) {
         let currentQuestion = questions[currentQuestionIndex]
         let givenAnswer = true
+        currentQuestionIndex += 1
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
         let currentQuestion = questions[currentQuestionIndex]
         let givenAnswer = false
+        currentQuestionIndex += 1
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     // MARK: - Functions
@@ -89,17 +89,17 @@ final class MovieQuizViewController: UIViewController {
     }
     
     private func showNextQuestionsOrResults(){
-        if currentQuestionIndex == questions.count - 1{
-            // показать результат квиза
+        imageView.layer.borderColor = UIColor.clear.cgColor
+        if currentQuestionIndex == questions.count {
             let text = "Ваш результат :\(correctAnswers)/\(questions.count)"
             let viewModel = QuizResultsViewModel(title: "Этот раунд окончен", text: text, buttonText: "Сыграть еще раз")
+            self.show(quiz: viewModel)
         }else{
-            currentQuestionIndex += 1
-            // показать следующий вопрос (через 1 секунду)
             let question = self.questions[self.currentQuestionIndex]
             let viewModel = self.convert(model: question)
             self.show(quiz: viewModel)
-            // Вот здесь нужно дописать функцию, считывающую инфу с вьюмодели и раскидывающую по вьюшкам
+//            currentQuestionIndex += 1
+            print(currentQuestionIndex)
         }
     }
 }
