@@ -27,8 +27,6 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
       super.viewDidLoad()
       showNextQuestionsOrResults()
-        //print(questions.count)
-        print(questions[9])
     }
     
     // MARK: - Actions
@@ -53,12 +51,11 @@ final class MovieQuizViewController: UIViewController {
     }
     
     private func show(quiz result: QuizResultsViewModel) {
-        let alert = UIAlertController(title: result.title, // заголовок всплывающего окна
-                                      message: result.text, // текст во всплывающем окне
-                                      preferredStyle: .alert) // preferredStyle может быть .alert или .actionSheet
+        let alert = UIAlertController(title: result.title,
+                                      message: result.text,
+                                      preferredStyle: .alert)
 
         let action = UIAlertAction(title: result.buttonText, style: .default, handler: { _ in
-          // вот этот код с переключением индекса и показом первого вопроса надо будет написать тут
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
             let firstQuestion = self.questions[self.currentQuestionIndex]
@@ -98,7 +95,6 @@ final class MovieQuizViewController: UIViewController {
             let question = self.questions[self.currentQuestionIndex]
             let viewModel = self.convert(model: question)
             self.show(quiz: viewModel)
-//            currentQuestionIndex += 1
             print(currentQuestionIndex)
         }
     }
