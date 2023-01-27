@@ -51,6 +51,11 @@
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="Ow9-tP-eL2" secondAttribute="height" multiplier="2:3" id="vmy-9p-FNJ"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="20"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Рейтинг этого фильма меньше, чем 5?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SXU-KU-0mx" userLabel="Question Label">
                                         <rect key="frame" x="0.0" y="604.5" width="374" height="54"/>
@@ -109,7 +114,7 @@
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" name="black"/>
                         <constraints>
                             <constraint firstItem="vMi-7i-0WT" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="7ff-FN-r9e"/>
                             <constraint firstItem="vMi-7i-0WT" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="f2U-ak-qKX"/>
@@ -128,6 +133,9 @@
         </scene>
     </scenes>
     <resources>
+        <namedColor name="black">
+            <color red="0.10199999809265137" green="0.10599999874830246" blue="0.13300000131130219" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="white">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
