@@ -1,8 +1,8 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
-    private let questionFactory: QuestionFactoryProtocol = QuestionFactory()
+    private var questionFactory: QuestionFactoryProtocol?
     private let questionAmount: Int = 10
     private var currentQuestion: QuizQuestion?
     private var currentQuestionIndex = 0
@@ -17,8 +17,27 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
       super.viewDidLoad()
+      
+      questionFactory = QuestionFactory(delegate: self)
       showNextQuestionsOrResults()
     }
+    
+    // MARK: - QuestionFactoryDelegate
+    
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+                return
+        }
+            
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        DispatchQueue.main.async{ [weak self] in
+            self?.show(quiz: viewModel)
+        }
+        
+    }
+    
+    
     
     // MARK: - Actions
     @IBAction private func yesButtonClicked(_ sender: Any) {
@@ -54,11 +73,7 @@ final class MovieQuizViewController: UIViewController {
             guard let self = self else { return }
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
-            if let firstQuestion = self.questionFactory.requestNextQuestion(){
-                self.currentQuestion = firstQuestion
-                let viewModel = self.convert(model: firstQuestion)
-                self.show(quiz: viewModel)
-            }
+            self.questionFactory?.requestNextQuestion()
         })
         alert.addAction(action)
         self.present(alert, animated: true, completion: nil)
@@ -91,11 +106,7 @@ final class MovieQuizViewController: UIViewController {
             let viewModel = QuizResultsViewModel(title: "Этот раунд окончен", text: text, buttonText: "Сыграть еще раз")
             self.show(quiz: viewModel)
         }else{
-            if let nextQuestion = questionFactory.requestNextQuestion(){
-                currentQuestion = nextQuestion
-                let viewModel = convert(model: nextQuestion)
-                show(quiz: viewModel)
-            }
+            questionFactory?.requestNextQuestion()
         }
     }
 }
