@@ -3,6 +3,7 @@ import UIKit
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private var questionFactory: QuestionFactoryProtocol?
+    private var statisticService: StatisticService?
     private let questionAmount: Int = 10
     private var currentQuestion: QuizQuestion?
     private var currentQuestionIndex = 0
@@ -101,7 +102,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func showNextQuestionsOrResults(){
         imageView.layer.borderColor = UIColor.clear.cgColor
         if currentQuestionIndex == questionAmount {
-            let text = "Ваш результат: \(correctAnswers)/\(questionAmount)"
+            //let text = "Ваш результат: \(correctAnswers)/\(questionAmount)"
+            statisticService = StatisticServiceImplementation()
+            statisticService?.store(correct: correctAnswers, total: questionAmount)
+            let text = "Ваш результат: \(correctAnswers)/\(questionAmount)\nКоличество сыгранных квизов \(statisticService!.gamesCount)\nРекорд: \(statisticService!.bestGame.correct)/\(statisticService!.bestGame.total) (\(statisticService!.bestGame.date.dateTimeString))\nСредняя точность: \(statisticService!.totalAccuracy)%"
             let viewModel = QuizResultsViewModel(title: "Этот раунд окончен", text: text, buttonText: "Сыграть еще раз")
             func completion(){
                 self.currentQuestionIndex = 0
