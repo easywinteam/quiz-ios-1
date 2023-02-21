@@ -13,7 +13,9 @@ final class StatisticServiceImplementation: StatisticService {
         case correct, total, bestGame, gamesCount
     }
     var totalAccuracy: Double{
-        return userDefaults.double(forKey: Keys.total.rawValue)
+        let correct = userDefaults.integer(forKey: Keys.correct.rawValue)
+        let total = userDefaults.integer(forKey: Keys.total.rawValue)
+        return Double(correct) / Double(total) * 100.0
     }
     var gamesCount: Int{
         return userDefaults.integer(forKey: Keys.gamesCount.rawValue)
@@ -40,7 +42,17 @@ final class StatisticServiceImplementation: StatisticService {
         if bestGame < newResult{
             bestGame = newResult
         }
+        incrementGamesCount()
+        calculateNewAccuracy(correct: count, total: amount)
     }
-    
-    
+    private func incrementGamesCount(){
+        userDefaults.set(gamesCount + 1, forKey: Keys.gamesCount.rawValue)
+    }
+    //Функция сохраняет количества правильных ответов и заданных вопросов в дефолтсы. Таким образом вычисляется обновленная точность правильных ответов totalAccuracy
+    private func calculateNewAccuracy(correct count: Int, total amount: Int){
+        let correct = userDefaults.integer(forKey: Keys.correct.rawValue)
+        let total = userDefaults.integer(forKey: Keys.total.rawValue)
+        userDefaults.set(correct + count, forKey: Keys.correct.rawValue)
+        userDefaults.set(total + amount, forKey: Keys.total.rawValue)
+    }
 }
