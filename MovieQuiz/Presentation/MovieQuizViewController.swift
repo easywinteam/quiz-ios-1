@@ -37,8 +37,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
     }
     
-    
-    
     // MARK: - Actions
     @IBAction private func yesButtonClicked(_ sender: Any) {
         guard let currentQuestion = currentQuestion else{
@@ -63,21 +61,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
     }
-    
-//    private func show(quiz result: QuizResultsViewModel) {
-//        let alert = UIAlertController(title: result.title,
-//                                      message: result.text,
-//                                      preferredStyle: .alert)
-//
-//        let action = UIAlertAction(title: result.buttonText, style: .default, handler: { [weak self] _ in
-//            guard let self = self else { return }
-//            self.currentQuestionIndex = 0
-//            self.correctAnswers = 0
-//            self.questionFactory?.requestNextQuestion()
-//        })
-//        alert.addAction(action)
-//        self.present(alert, animated: true, completion: nil)
-//    }
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel{
         return QuizStepViewModel(image: UIImage(named: model.image) ?? UIImage(), question: model.text, questionNumber: "\(currentQuestionIndex + 1)/\(questionAmount)")
@@ -105,14 +88,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             //let text = "Ваш результат: \(correctAnswers)/\(questionAmount)"
             statisticService = StatisticServiceImplementation()
             statisticService?.store(correct: correctAnswers, total: questionAmount)
-            let text = "Ваш результат: \(correctAnswers)/\(questionAmount)\nКоличество сыгранных квизов \(statisticService!.gamesCount)\nРекорд: \(statisticService!.bestGame.correct)/\(statisticService!.bestGame.total) (\(statisticService!.bestGame.date.dateTimeString))\nСредняя точность: \(statisticService!.totalAccuracy)%"
+            let text = "Ваш результат: \(correctAnswers)/\(questionAmount)\nКоличество сыгранных квизов: \(statisticService!.gamesCount)\nРекорд: \(statisticService!.bestGame.correct)/\(statisticService!.bestGame.total) (\(statisticService!.bestGame.date.dateTimeString))\nСредняя точность: \(String(format: "%.2f",statisticService!.totalAccuracy))%"
             let viewModel = QuizResultsViewModel(title: "Этот раунд окончен", text: text, buttonText: "Сыграть еще раз")
             func completion(){
                 self.currentQuestionIndex = 0
                 self.correctAnswers = 0
                 self.questionFactory?.requestNextQuestion()
             }
-            let alertModel = AlertModel(title: "Этот раунд окончен", message: text, buttonText: "Сыграть еще раз", completion: completion())
+            let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть еще раз", completion: completion())
             let alertPresenter = AlertPresenter(vc: self, model: alertModel)
             alertPresenter.show()
         }else{
