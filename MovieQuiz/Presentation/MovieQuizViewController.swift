@@ -12,6 +12,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Outlets
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private var counterLabel: UILabel!
     
     
@@ -101,6 +102,26 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }else{
             questionFactory?.requestNextQuestion()
         }
+    }
+    private func showLoadingIndicator(){
+        activityIndicator.isHidden = false //говорим, что индикатор загрузки не скрыт
+        activityIndicator.startAnimating() //включаем анимацию
+    }
+    private func hideLoadingIndicator(){
+        activityIndicator.stopAnimating()
+        activityIndicator.isHidden = true
+    }
+    private func showNetworkError(message: String){
+        hideLoadingIndicator()//скрываем индикатор загрузки
+        //создайте и покажите алерт
+        func completion(){
+            currentQuestionIndex = 0
+            correctAnswers = 0
+            questionFactory?.requestNextQuestion()
+        }
+        let alertModel = AlertModel(title: "Ошибка", message: "Не удалось загрузить данные", buttonText: "Попробовать еще раз",completion: completion())
+        let alertPresenter = AlertPresenter(vc: self, model: alertModel)
+        alertPresenter.show()
     }
 }
 
