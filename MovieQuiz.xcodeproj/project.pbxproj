@@ -19,6 +19,7 @@
 		91AA990F29992CBB00A9BD09 /* AlertPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AA990E29992CBB00A9BD09 /* AlertPresenter.swift */; };
 		91B170CD29AAB3DD004FE170 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B170CC29AAB3DC004FE170 /* NetworkClient.swift */; };
 		91B170CF29ABD37F004FE170 /* MostPopularMovies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B170CE29ABD37F004FE170 /* MostPopularMovies.swift */; };
+		91B170D129ABE587004FE170 /* MoviesLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B170D029ABE587004FE170 /* MoviesLoader.swift */; };
 		91C94375296DE25700E70E49 /* YS Display-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 91C94373296DE25600E70E49 /* YS Display-Medium.ttf */; };
 		91C94376296DE25700E70E49 /* YS Display-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 91C94374296DE25700E70E49 /* YS Display-Bold.ttf */; };
 		AD1ABAB22831907B00B3E448 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1ABAB12831907B00B3E448 /* AppDelegate.swift */; };
@@ -45,6 +46,7 @@
 		91AA990E29992CBB00A9BD09 /* AlertPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPresenter.swift; sourceTree = "<group>"; };
 		91B170CC29AAB3DC004FE170 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
 		91B170CE29ABD37F004FE170 /* MostPopularMovies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MostPopularMovies.swift; sourceTree = "<group>"; };
+		91B170D029ABE587004FE170 /* MoviesLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesLoader.swift; sourceTree = "<group>"; };
 		91C94373296DE25600E70E49 /* YS Display-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Medium.ttf"; sourceTree = "<group>"; };
 		91C94374296DE25700E70E49 /* YS Display-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Bold.ttf"; sourceTree = "<group>"; };
 		AD1ABAAE2831907B00B3E448 /* MovieQuiz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MovieQuiz.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,6 +103,7 @@
 				917F444D2997DB5C0061813C /* QuestionFactoryDelegate.swift */,
 				91100A5129A296A900EF3B81 /* StatisticService.swift */,
 				91B170CC29AAB3DC004FE170 /* NetworkClient.swift */,
+				91B170D029ABE587004FE170 /* MoviesLoader.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -270,6 +273,7 @@
 				917F444329942A6E0061813C /* QuestionFactory.swift in Sources */,
 				AD77F5742857F8810062FB14 /* Date+Extensions.swift in Sources */,
 				AD1ABAB22831907B00B3E448 /* AppDelegate.swift in Sources */,
+				91B170D129ABE587004FE170 /* MoviesLoader.swift in Sources */,
 				917F44482994ECBD0061813C /* QuizResultsViewModel.swift in Sources */,
 				AD1ABAB42831907B00B3E448 /* SceneDelegate.swift in Sources */,
 			);
