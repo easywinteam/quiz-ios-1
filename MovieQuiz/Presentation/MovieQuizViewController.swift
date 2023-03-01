@@ -19,8 +19,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Lifecycle
     override func viewDidLoad() {
       super.viewDidLoad()
-      questionFactory = QuestionFactory(delegate: self)
-      showNextQuestionsOrResults()
+      let moviesLoader = MoviesLoader()
+      questionFactory = QuestionFactory(moviesLoader: moviesLoader, delegate: self)
+      showLoadingIndicator()
+      questionFactory?.loadData()
+      //showNextQuestionsOrResults()
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -36,6 +39,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self?.show(quiz: viewModel)
         }
         
+    }
+    
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true //скрываем индикатор загрузки
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
     }
     
     // MARK: - Actions
@@ -64,7 +76,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel{
-        return QuizStepViewModel(image: UIImage(named: model.image) ?? UIImage(), question: model.text, questionNumber: "\(currentQuestionIndex + 1)/\(questionAmount)")
+        return QuizStepViewModel(image: UIImage(data: model.image) ?? UIImage() , question: model.text, questionNumber: "\(currentQuestionIndex + 1)/\(questionAmount)")
     }
     
     private func showAnswerResult(isCorrect: Bool){
@@ -86,7 +98,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func showNextQuestionsOrResults(){
         imageView.layer.borderColor = UIColor.clear.cgColor
         if currentQuestionIndex == questionAmount {
-            //let text = "Ваш результат: \(correctAnswers)/\(questionAmount)"
             statisticService = StatisticServiceImplementation()
             statisticService?.store(correct: correctAnswers, total: questionAmount)
             let text = "Ваш результат: \(correctAnswers)/\(questionAmount)\nКоличество сыгранных квизов: \(statisticService!.gamesCount)\nРекорд: \(statisticService!.bestGame.correct)/\(statisticService!.bestGame.total) (\(statisticService!.bestGame.date.dateTimeString))\nСредняя точность: \(String(format: "%.2f",statisticService!.totalAccuracy))%"
