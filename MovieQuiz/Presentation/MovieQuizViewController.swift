@@ -99,7 +99,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         if currentQuestionIndex == questionAmount {
             statisticService = StatisticServiceImplementation()
             statisticService?.store(correct: correctAnswers, total: questionAmount)
-            let text = "Ваш результат: \(correctAnswers)/\(questionAmount)\nКоличество сыгранных квизов: \(statisticService!.gamesCount)\nРекорд: \(statisticService!.bestGame.correct)/\(statisticService!.bestGame.total) (\(statisticService!.bestGame.date.dateTimeString))\nСредняя точность: \(String(format: "%.2f",statisticService!.totalAccuracy))%"
+            let text = """
+Ваш результат: \(correctAnswers)/\(questionAmount)
+Количество сыгранных квизов: \(statisticService!.gamesCount)
+Рекорд: \(statisticService!.bestGame.correct)/\(statisticService!.bestGame.total) (\(statisticService!.bestGame.date.dateTimeString))
+Средняя точность: \(String(format: "%.2f",statisticService!.totalAccuracy))%
+"""
             func completion(){
                 self.currentQuestionIndex = 0
                 self.correctAnswers = 0
