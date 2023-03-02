@@ -18,21 +18,20 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
-      super.viewDidLoad()
-      let moviesLoader = MoviesLoader()
-      questionFactory = QuestionFactory(moviesLoader: moviesLoader, delegate: self)
-      showLoadingIndicator()
-      questionFactory?.loadData()
-      //showNextQuestionsOrResults()
+        super.viewDidLoad()
+        let moviesLoader = MoviesLoader()
+        questionFactory = QuestionFactory(moviesLoader: moviesLoader, delegate: self)
+        showLoadingIndicator()
+        questionFactory?.loadData()
     }
     
     // MARK: - QuestionFactoryDelegate
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
-                return
+            return
         }
-            
+        
         currentQuestion = question
         let viewModel = convert(model: question)
         DispatchQueue.main.async{ [weak self] in
