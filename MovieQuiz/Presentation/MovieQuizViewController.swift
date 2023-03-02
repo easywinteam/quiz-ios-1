@@ -98,12 +98,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.layer.borderColor = UIColor.clear.cgColor
         if currentQuestionIndex == questionAmount {
             statisticService = StatisticServiceImplementation()
-            statisticService?.store(correct: correctAnswers, total: questionAmount)
+            guard let statisticService = statisticService else { return }
+            statisticService.store(correct: correctAnswers, total: questionAmount)
             let text = """
 Ваш результат: \(correctAnswers)/\(questionAmount)
-Количество сыгранных квизов: \(statisticService!.gamesCount)
-Рекорд: \(statisticService!.bestGame.correct)/\(statisticService!.bestGame.total) (\(statisticService!.bestGame.date.dateTimeString))
-Средняя точность: \(String(format: "%.2f",statisticService!.totalAccuracy))%
+Количество сыгранных квизов: \(statisticService.gamesCount)
+Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
+Средняя точность: \(String(format: "%.2f",statisticService.totalAccuracy))%
 """
             func completion(){
                 self.currentQuestionIndex = 0
