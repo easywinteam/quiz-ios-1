@@ -132,6 +132,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         func completion(){
             currentQuestionIndex = 0
             correctAnswers = 0
+            questionFactory?.loadData()
             questionFactory?.requestNextQuestion()
         }
         let alertModel = AlertModel(title: "Ошибка", message: "Не удалось загрузить данные", buttonText: "Попробовать еще раз",completion: completion())
