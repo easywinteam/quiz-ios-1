@@ -112,8 +112,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 self.questionFactory?.requestNextQuestion()
             }
             let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть еще раз", completion: completion())
-            let alertPresenter = AlertPresenter(vc: self, model: alertModel)
-            alertPresenter.show()
+            let alertPresenter = AlertPresenter()
+            alertPresenter.show(vc: self, model: alertModel)
         }else{
             questionFactory?.requestNextQuestion()
         }
@@ -136,8 +136,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             questionFactory?.requestNextQuestion()
         }
         let alertModel = AlertModel(title: "Ошибка", message: "Не удалось загрузить данные", buttonText: "Попробовать еще раз",completion: completion())
-        let alertPresenter = AlertPresenter(vc: self, model: alertModel)
-        alertPresenter.show()
+        let alertPresenter = AlertPresenter()
+        alertPresenter.show(vc: self, model: alertModel)
     }
 }
 
