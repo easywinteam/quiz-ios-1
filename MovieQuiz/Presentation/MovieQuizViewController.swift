@@ -106,12 +106,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
 Средняя точность: \(String(format: "%.2f",statisticService.totalAccuracy))%
 """
-            func completion(){
+
+            let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть еще раз"){[weak self] in
+                guard let self = self else { return }
                 self.currentQuestionIndex = 0
                 self.correctAnswers = 0
                 self.questionFactory?.requestNextQuestion()
             }
-            let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть еще раз", completion: completion())
             let alertPresenter = AlertPresenter()
             alertPresenter.show(vc: self, model: alertModel)
         }else{
@@ -129,13 +130,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func showNetworkError(message: String){
         hideLoadingIndicator()//скрываем индикатор загрузки
         //создайте и покажите алерт
-        func completion(){
-            currentQuestionIndex = 0
-            correctAnswers = 0
-            questionFactory?.loadData()
-            questionFactory?.requestNextQuestion()
+        let alertModel = AlertModel(title: "Ошибка", message: "Не удалось загрузить данные", buttonText: "Попробовать еще раз"){[weak self] in
+            guard let self = self else { return }
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            self.questionFactory?.loadData()
+            self.questionFactory?.requestNextQuestion()
         }
-        let alertModel = AlertModel(title: "Ошибка", message: "Не удалось загрузить данные", buttonText: "Попробовать еще раз",completion: completion())
         let alertPresenter = AlertPresenter()
         alertPresenter.show(vc: self, model: alertModel)
     }
