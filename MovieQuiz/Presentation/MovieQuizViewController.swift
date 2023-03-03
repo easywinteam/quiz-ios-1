@@ -1,48 +1,70 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
-    // MARK: - MockData
-    private let questions : [QuizQuestion] = [
-    QuizQuestion(image: "The Godfather", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
-    QuizQuestion(image: "The Dark Knight", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
-    QuizQuestion(image: "Kill Bill", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
-    QuizQuestion(image: "The Avengers", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
-    QuizQuestion(image: "Deadpool", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
-    QuizQuestion(image: "The Green Knight", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
-    QuizQuestion(image: "Old", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
-    QuizQuestion(image: "The Ice Age Adventures of Buck Wild", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
-    QuizQuestion(image: "Tesla", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
-    QuizQuestion(image: "Vivarium", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
-    QuizQuestion(image: "", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false)
-    ]
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+    
+    private var questionFactory: QuestionFactoryProtocol?
+    private var statisticService: StatisticService?
+    private let questionAmount: Int = 10
+    private var currentQuestion: QuizQuestion?
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
     // MARK: - Outlets
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private var counterLabel: UILabel!
     
-    // MARK: - Alerts
-    let action = UIAlertAction(title: "Сыграть ещё раз", style: .default, handler: { _ in
-    })
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
-      super.viewDidLoad()
-      showNextQuestionsOrResults()
+        super.viewDidLoad()
+        let moviesLoader = MoviesLoader()
+        questionFactory = QuestionFactory(moviesLoader: moviesLoader, delegate: self)
+        showLoadingIndicator()
+        questionFactory?.loadData()
+    }
+    
+    // MARK: - QuestionFactoryDelegate
+    
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+            return
+        }
+        
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        DispatchQueue.main.async{ [weak self] in
+            self?.show(quiz: viewModel)
+        }
+        
+    }
+    
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true //скрываем индикатор загрузки
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
     }
     
     // MARK: - Actions
     @IBAction private func yesButtonClicked(_ sender: Any) {
-        let currentQuestion = questions[currentQuestionIndex]
+        guard let currentQuestion = currentQuestion else{
+            return
+        }
         let givenAnswer = true
+        currentQuestionIndex += 1
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
-        let currentQuestion = questions[currentQuestionIndex]
+        guard let currentQuestion = currentQuestion else{
+            return
+        }
         let givenAnswer = false
+        currentQuestionIndex += 1
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     // MARK: - Functions
@@ -52,25 +74,8 @@ final class MovieQuizViewController: UIViewController {
         counterLabel.text = step.questionNumber
     }
     
-    private func show(quiz result: QuizResultsViewModel) {
-        let alert = UIAlertController(title: result.title, // заголовок всплывающего окна
-                                      message: result.text, // текст во всплывающем окне
-                                      preferredStyle: .alert) // preferredStyle может быть .alert или .actionSheet
-
-        let action = UIAlertAction(title: result.buttonText, style: .default, handler: { _ in
-          // вот этот код с переключением индекса и показом первого вопроса надо будет написать тут
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            let firstQuestion = self.questions[self.currentQuestionIndex]
-            let viewModel = self.convert(model: firstQuestion)
-            self.show(quiz: viewModel)
-        })
-        alert.addAction(action)
-        self.present(alert, animated: true, completion: nil)
-    }
-    
     private func convert(model: QuizQuestion) -> QuizStepViewModel{
-        return QuizStepViewModel(image: UIImage(named: model.image) ?? UIImage(), question: model.text, questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)")
+        return QuizStepViewModel(image: UIImage(data: model.image) ?? UIImage() , question: model.text, questionNumber: "\(currentQuestionIndex + 1)/\(questionAmount)")
     }
     
     private func showAnswerResult(isCorrect: Bool){
@@ -83,106 +88,59 @@ final class MovieQuizViewController: UIViewController {
         }else{
             imageView.layer.borderColor = UIColor.ypRed.cgColor
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0){[weak self] in
+            guard let self = self else{ return }
             self.showNextQuestionsOrResults()
         }
     }
     
     private func showNextQuestionsOrResults(){
-        if currentQuestionIndex == questions.count - 1{
-            // показать результат квиза
-            let text = "Ваш результат :\(correctAnswers)/\(questions.count)"
-            let viewModel = QuizResultsViewModel(title: "Этот раунд окончен", text: text, buttonText: "Сыграть еще раз")
+        imageView.layer.borderColor = UIColor.clear.cgColor
+        if currentQuestionIndex == questionAmount {
+            statisticService = StatisticServiceImplementation()
+            guard let statisticService = statisticService else { return }
+            statisticService.store(correct: correctAnswers, total: questionAmount)
+            let text = """
+Ваш результат: \(correctAnswers)/\(questionAmount)
+Количество сыгранных квизов: \(statisticService.gamesCount)
+Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
+Средняя точность: \(String(format: "%.2f",statisticService.totalAccuracy))%
+"""
+
+            let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть еще раз"){[weak self] in
+                guard let self = self else { return }
+                self.currentQuestionIndex = 0
+                self.correctAnswers = 0
+                self.questionFactory?.requestNextQuestion()
+            }
+            let alertPresenter = AlertPresenter()
+            alertPresenter.show(vc: self, model: alertModel)
         }else{
-            currentQuestionIndex += 1
-            // показать следующий вопрос (через 1 секунду)
-            let question = self.questions[self.currentQuestionIndex]
-            let viewModel = self.convert(model: question)
-            self.show(quiz: viewModel)
-            // Вот здесь нужно дописать функцию, считывающую инфу с вьюмодели и раскидывающую по вьюшкам
+            questionFactory?.requestNextQuestion()
         }
+    }
+    private func showLoadingIndicator(){
+        activityIndicator.isHidden = false //говорим, что индикатор загрузки не скрыт
+        activityIndicator.startAnimating() //включаем анимацию
+    }
+    private func hideLoadingIndicator(){
+        activityIndicator.stopAnimating()
+        activityIndicator.isHidden = true
+    }
+    private func showNetworkError(message: String){
+        hideLoadingIndicator()//скрываем индикатор загрузки
+        //создайте и покажите алерт
+        let alertModel = AlertModel(title: "Ошибка", message: "Не удалось загрузить данные", buttonText: "Попробовать еще раз"){[weak self] in
+            guard let self = self else { return }
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            self.questionFactory?.loadData()
+            self.questionFactory?.requestNextQuestion()
+        }
+        let alertPresenter = AlertPresenter()
+        alertPresenter.show(vc: self, model: alertModel)
     }
 }
 
-// MARK: - Additional data structures
-struct QuizQuestion{
-    let image: String
-    let text: String
-    let correctAnswer: Bool
-}
-//Для состояния "Вопрос задан"
-struct QuizStepViewModel{
-    let image: UIImage
-    let question: String
-    let questionNumber: String
-}
-
-// для состояния "Результат квиза"
-struct QuizResultsViewModel {
-  let title: String
-  let text: String
-  let buttonText: String
-}
-/*
- Mock-данные
- 
- 
- Картинка: The Godfather
- Настоящий рейтинг: 9,2
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
 
 
- Картинка: The Dark Knight
- Настоящий рейтинг: 9
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: Kill Bill
- Настоящий рейтинг: 8,1
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: The Avengers
- Настоящий рейтинг: 8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: Deadpool
- Настоящий рейтинг: 8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: The Green Knight
- Настоящий рейтинг: 6,6
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: Old
- Настоящий рейтинг: 5,8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
-
-
- Картинка: The Ice Age Adventures of Buck Wild
- Настоящий рейтинг: 4,3
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
-
-
- Картинка: Tesla
- Настоящий рейтинг: 5,1
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
-
-
- Картинка: Vivarium
- Настоящий рейтинг: 5,8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
- */
