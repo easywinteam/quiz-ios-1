@@ -19,6 +19,8 @@ struct MoviesLoader: MoviesLoading{
         }
         return url
     }
+    //k_12345678 -- wrong api key
+    //k_azezgvdf
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
         networkClient.fetch(url: mostPopularMoviesURL){result in
             switch result{
