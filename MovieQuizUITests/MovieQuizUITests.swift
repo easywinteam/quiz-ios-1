@@ -24,16 +24,31 @@ final class MovieQuizUITests: XCTestCase {
     
     func testYesButton() throws{
         sleep(3)
+        let indexLabel = app.staticTexts["Index"]
         let firstPoster = app.images["Poster"]
         let firstPosterData = firstPoster.screenshot().pngRepresentation
-        app.buttons["Yes"].tap()
+        app.buttons["No"].tap()
         sleep(3)
         let secondPoster = app.images["Poster"]
-        
+
         let secondPosterData = secondPoster.screenshot().pngRepresentation
-        
-        
+
+
         XCTAssertFalse(firstPosterData == secondPosterData)
+        XCTAssertEqual(indexLabel.label, "2/10")
+    }
+    func testAlert(){
+        let buttonYes = app/*@START_MENU_TOKEN@*/.staticTexts["Да"]/*[[".buttons[\"Да\"].staticTexts[\"Да\"]",".buttons[\"Yes\"].staticTexts[\"Да\"]",".staticTexts[\"Да\"]"],[[[-1,2],[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/
+
+        for _ in 0..<10{
+            buttonYes.tap()
+            sleep(1)
+        }
+        let alert = app.alerts["Alert"]
+        XCTAssertTrue(alert.exists)
+        XCTAssertEqual(alert.label, "Этот раунд окончен!")
+        XCTAssertEqual(alert.buttons.firstMatch.label, "Сыграть еще раз")
+        
     }
     
 }
