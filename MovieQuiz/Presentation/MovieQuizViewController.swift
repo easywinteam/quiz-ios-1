@@ -4,9 +4,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private var questionFactory: QuestionFactoryProtocol?
     private var statisticService: StatisticService?
-    private let questionAmount: Int = 10
+    private let presenter = MovieQuizPresenter()
     private var currentQuestion: QuizQuestion?
-    private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
     // MARK: - Outlets
@@ -33,7 +32,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         DispatchQueue.main.async{ [weak self] in
             self?.show(quiz: viewModel)
         }
@@ -55,7 +54,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             return
         }
         let givenAnswer = true
-        currentQuestionIndex += 1
+        presenter.switchToNextQuestion()
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
@@ -64,7 +63,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             return
         }
         let givenAnswer = false
-        currentQuestionIndex += 1
+        presenter.switchToNextQuestion()
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     // MARK: - Functions
@@ -74,9 +73,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         counterLabel.text = step.questionNumber
     }
     
-    private func convert(model: QuizQuestion) -> QuizStepViewModel{
-        return QuizStepViewModel(image: UIImage(data: model.image) ?? UIImage() , question: model.text, questionNumber: "\(currentQuestionIndex + 1)/\(questionAmount)")
-    }
     
     private func showAnswerResult(isCorrect: Bool){
         imageView.layer.masksToBounds = true
@@ -96,12 +92,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showNextQuestionsOrResults(){
         imageView.layer.borderColor = UIColor.clear.cgColor
-        if currentQuestionIndex == questionAmount {
+        if presenter.isLastQuestion() {
             statisticService = StatisticServiceImplementation()
             guard let statisticService = statisticService else { return }
-            statisticService.store(correct: correctAnswers, total: questionAmount)
+            statisticService.store(correct: correctAnswers, total: presenter.questionAmount)
             let text = """
-Ваш результат: \(correctAnswers)/\(questionAmount)
+Ваш результат: \(correctAnswers)/\(presenter.questionAmount)
 Количество сыгранных квизов: \(statisticService.gamesCount)
 Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
 Средняя точность: \(String(format: "%.2f",statisticService.totalAccuracy))%
@@ -109,7 +105,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
             let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть еще раз"){[weak self] in
                 guard let self = self else { return }
-                self.currentQuestionIndex = 0
+                self.presenter.resetQuestionIndex()
                 self.correctAnswers = 0
                 self.questionFactory?.requestNextQuestion()
             }
@@ -132,7 +128,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         //создайте и покажите алерт
         let alertModel = AlertModel(title: "Ошибка", message: "Не удалось загрузить данные", buttonText: "Попробовать еще раз"){[weak self] in
             guard let self = self else { return }
-            self.currentQuestionIndex = 0
+            self.presenter.resetQuestionIndex()
             self.correctAnswers = 0
             self.questionFactory?.loadData()
             self.questionFactory?.requestNextQuestion()
