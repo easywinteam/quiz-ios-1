@@ -57,12 +57,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
-        guard let currentQuestion = currentQuestion else{
-            return
-        }
-        let givenAnswer = false
-        presenter.switchToNextQuestion()
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        presenter.currentQuestion = currentQuestion
+        presenter.noButtonClicked()
     }
     // MARK: - Functions
     private func show(quiz step: QuizStepViewModel){
