@@ -2,12 +2,13 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate{
     
-    let questionAmount: Int = 10
+    private let questionAmount: Int = 10
     private var currentQuestionIndex: Int = 0
-    var correctAnswers: Int = 0
-    var currentQuestion: QuizQuestion?
-    weak var viewController: MovieQuizViewController?
-    var questionFactory: QuestionFactoryProtocol?
+    private var correctAnswers: Int = 0
+    
+    private var currentQuestion: QuizQuestion?
+    private weak var viewController: MovieQuizViewController?
+    private var questionFactory: QuestionFactoryProtocol?
     private let statisticService: StatisticService!
     
     init(viewController: MovieQuizViewController){
@@ -49,11 +50,11 @@ final class MovieQuizPresenter: QuestionFactoryDelegate{
         }
         let givenAnswer = isYes
         switchToNextQuestion()
-        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
-    func showNextQuestionsOrResults(){
-        viewController?.imageView.layer.borderColor = UIColor.clear.cgColor
+    private func proceedToNextQuestionsOrResults(){
+        viewController?.clearColor()
         if self.isLastQuestion() {
             let text = makeResultMessage()
             let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть еще раз"){[weak self] in
@@ -72,6 +73,14 @@ final class MovieQuizPresenter: QuestionFactoryDelegate{
     func didAnswer(isCorrect: Bool){
         if isCorrect{
             correctAnswers += 1
+        }
+    }
+    
+    private func proceedWithAnswer(isCorrect: Bool){
+        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0){[weak self] in
+            guard let self = self else{ return }
+            self.proceedToNextQuestionsOrResults()
         }
     }
     
@@ -101,7 +110,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate{
     }
     
     func didLoadDataFromServer() {
-        viewController?.activityIndicator.isHidden = true //скрываем индикатор загрузки
+        viewController?.hideLoadingIndicator() //скрываем индикатор загрузки
         questionFactory?.requestNextQuestion()
     }
     

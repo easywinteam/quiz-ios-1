@@ -5,9 +5,9 @@ final class MovieQuizViewController: UIViewController {
     private var presenter: MovieQuizPresenter!
     
     // MARK: - Outlets
-    @IBOutlet var imageView: UIImageView!
+    @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
-    @IBOutlet var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private var counterLabel: UILabel!
     
     
@@ -37,22 +37,21 @@ final class MovieQuizViewController: UIViewController {
     }
     
     
-    func showAnswerResult(isCorrect: Bool){
+    func highlightImageBorder(isCorrectAnswer: Bool){
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.cornerRadius = 20
         presenter.didAnswer(isCorrect: true)
-        if isCorrect{
+        if isCorrectAnswer{
             imageView.layer.borderColor = UIColor.ypGreen.cgColor
         }else{
             imageView.layer.borderColor = UIColor.ypRed.cgColor
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0){[weak self] in
-            guard let self = self else{ return }
-            self.presenter.showNextQuestionsOrResults()
-        }
     }
     
+    func clearColor(){
+        imageView.layer.borderColor = UIColor.clear.cgColor
+    }
     
     func showLoadingIndicator(){
         activityIndicator.isHidden = false //говорим, что индикатор загрузки не скрыт
